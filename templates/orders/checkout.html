@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}إتمام الطلب - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="checkout-form">
+        <div class="section-header">
+            <h2><i class="fas fa-credit-card"></i> إتمام الطلب</h2>
+        </div>
+
+        <form method="POST" action="{% url 'checkout' %}">
+            {% csrf_token %}
+
+            <h3 style="margin-bottom: 15px; color: var(--primary);">
+                <i class="fas fa-user"></i> معلومات العميل
+            </h3>
+
+            <div class="form-group">
+                <label for="full_name">الاسم الكامل *</label>
+                <input type="text" id="full_name" name="full_name" required placeholder="أدخل اسمك الكامل">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">رقم الهاتف *</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="0XXX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label for="phone2">رقم هاتف ثاني (اختياري)</label>
+                    <input type="tel" id="phone2" name="phone2" placeholder="0XXX XXX XXX">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="wilaya">الولاية *</label>
+                    <select id="wilaya" name="wilaya" required>
+                        <option value="">اختر الولاية</option>
+                        <option value="أدرار">أدرار</option>
+                        <option value="الشلف">الشلف</option>
+                        <option value="الأغواط">الأغواط</option>
+                        <option value="أم البواقي">أم البواقي</option>
+                        <option value="باتنة">باتنة</option>
+                        <option value="بجاية">بجاية</option>
+                        <option value="بسكرة">بسكرة</option>
+                        <option value="بشار">بشار</option>
+                        <option value="البليدة">البليدة</option>
+                        <option value="البويرة">البويرة</option>
+                        <option value="تمنراست">تمنراست</option>
+                        <option value="تبسة">تبسة</option>
+                        <option value="تلمسان">تلمسان</option>
+                        <option value="تيارت">تيارت</option>
+                        <option value="تيزي وزو">تيزي وزو</option>
+                        <option value="الجزائر">الجزائر</option>
+                        <option value="الجلفة">الجلفة</option>
+                        <option value="جيجل">جيجل</option>
+                        <option value="سطيف">سطيف</option>
+                        <option value="سعيدة">سعيدة</option>
+                        <option value="سكيكدة">سكيكدة</option>
+                        <option value="سيدي بلعباس">سيدي بلعباس</option>
+                        <option value="عنابة">عنابة</option>
+                        <option value="قالمة">قالمة</option>
+                        <option value="قسنطينة">قسنطينة</option>
+                        <option value="المدية">المدية</option>
+                        <option value="مستغانم">مستغانم</option>
+                        <option value="المسيلة">المسيلة</option>
+                        <option value="معسكر">معسكر</option>
+                        <option value="ورقلة">ورقلة</option>
+                        <option value="وهران">وهران</option>
+                        <option value="البيض">البيض</option>
+                        <option value="إليزي">إليزي</option>
+                        <option value="برج بوعريريج">برج بوعريريج</option>
+                        <option value="بومرداس">بومرداس</option>
+                        <option value="الطارف">الطارف</option>
+                        <option value="تندوف">تندوف</option>
+                        <option value="تيسمسيلت">تيسمسيلت</option>
+                        <option value="الوادي">الوادي</option>
+                        <option value="خنشلة">خنشلة</option>
+                        <option value="سوق أهراس">سوق أهراس</option>
+                        <option value="تيبازة">تيبازة</option>
+                        <option value="ميلة">ميلة</option>
+                        <option value="عين الدفلى">عين الدفلى</option>
+                        <option value="النعامة">النعامة</option>
+                        <option value="عين تموشنت">عين تموشنت</option>
+                        <option value="غرداية">غرداية</option>
+                        <option value="غليزان">غليزان</option>
+                        <option value="تيميمون">تيميمون</option>
+                        <option value="برج باجي مختار">برج باجي مختار</option>
+                        <option value="أولاد جلال">أولاد جلال</option>
+                        <option value="بني عباس">بني عباس</option>
+                        <option value="عين صالح">عين صالح</option>
+                        <option value="عين قزام">عين قزام</option>
+                        <option value="توقرت">توقرت</option>
+                        <option value="جانت">جانت</option>
+                        <option value="المغير">المغير</option>
+                        <option value="المنيعة">المنيعة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="commune">البلدية *</label>
+                    <input type="text" id="commune" name="commune" required placeholder="أدخل البلدية">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">العنوان بالتفصيل *</label>
+                <textarea id="address" name="address" rows="3" required placeholder="العنوان الكامل (الحي، الشارع، رقم المنزل...)"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">ملاحظات (اختياري)</label>
+                <textarea id="notes" name="notes" rows="2" placeholder="أي ملاحظات إضافية للطلب..."></textarea>
+            </div>
+
+            <h3 style="margin: 25px 0 15px; color: var(--primary);">
+                <i class="fas fa-money-bill-wave"></i> طريقة الدفع
+            </h3>
+
+            <div class="payment-options">
+                <label class="payment-option selected">
+                    <input type="radio" name="payment_method" value="cod" checked>
+                    <div>
+                        <strong>الدفع عند الاستلام</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 3px;">ادفع عند استلام الطلب</p>
+                    </div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment_method" value="ccp">
+                    <div>
+                        <strong>تحويل CCP</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 3px;">تحويل بنكي عبر بريد الجزائر</p>
+                    </div>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment_method" value="baridi">
+                    <div>
+                        <strong>باريدي موب</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 3px;">الدفع عبر تطبيق باريدي موب</p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="cart-summary" style="margin-top: 25px;">
+                <h3>ملخص الطلب</h3>
+                {% for item in cart %}
+                <div class="summary-row" style="font-size: 14px;">
+                    <span>{{ item.name }} × {{ item.quantity }}</span>
+                    <span>{{ item.total|floatformat:2 }} د.ج</span>
+                </div>
+                {% endfor %}
+                <div class="summary-row total">
+                    <span>المجموع الكلي</span>
+                    <span>{{ cart_total|floatformat:2 }} د.ج</span>
+                </div>
+            </div>
+
+            <button type="submit" class="add-to-cart-btn" style="margin-top: 20px; background: var(--gold); color: var(--primary-dark);">
+                <i class="fas fa-check-circle"></i>
+                تأكيد الطلب
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Payment option selection
+document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+    });
+});
+</script>
+{% endblock %}

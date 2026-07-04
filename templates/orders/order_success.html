@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تم الطلب بنجاح - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="order-success">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>تم إنشاء طلبك بنجاح!</h1>
+        <div class="order-number">رقم الطلب: #{{ order.pk }}</div>
+        <p style="font-size: 18px; color: var(--text-light); margin: 20px 0;">
+            شكراً لك {{ order.full_name }}! سيتم التواصل معك قريباً لتأكيد الطلب.
+        </p>
+
+        <div class="track-result" style="max-width: 500px; margin: 30px auto; text-align: right;">
+            <h3 style="margin-bottom: 15px;">تفاصيل الطلب</h3>
+            <div class="summary-row">
+                <span>الاسم:</span>
+                <span>{{ order.full_name }}</span>
+            </div>
+            <div class="summary-row">
+                <span>الهاتف:</span>
+                <span>{{ order.phone }}</span>
+            </div>
+            <div class="summary-row">
+                <span>الولاية:</span>
+                <span>{{ order.wilaya }}</span>
+            </div>
+            <div class="summary-row">
+                <span>البلدية:</span>
+                <span>{{ order.commune }}</span>
+            </div>
+            <div class="summary-row">
+                <span>طريقة الدفع:</span>
+                <span>{{ order.get_payment_method_display }}</span>
+            </div>
+            <div class="summary-row">
+                <span>الحالة:</span>
+                <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+            <div class="summary-row total">
+                <span>المجموع:</span>
+                <span>{{ order.total|floatformat:2 }} د.ج</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="{% url 'home' %}" class="hero-btn" style="margin: 0 10px;">
+                <i class="fas fa-home"></i> الرئيسية
+            </a>
+            <a href="{% url 'order_track' %}" class="hero-btn" style="margin: 0 10px; background: var(--primary); color: white;">
+                <i class="fas fa-search"></i> تتبع الطلب
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

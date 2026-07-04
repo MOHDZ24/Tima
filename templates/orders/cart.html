@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}سلة المشتريات - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container cart-page">
+    <div class="section-header">
+        <h2><i class="fas fa-shopping-cart"></i> سلة المشتريات</h2>
+    </div>
+
+    {% if cart|length > 0 %}
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div class="cart-items">
+            {% for item in cart %}
+            <div class="cart-item">
+                {% if item.image %}
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-item-image">
+                {% endif %}
+                <div class="cart-item-info">
+                    <h3>{{ item.name }}</h3>
+                    <div class="price">{{ item.price|floatformat:2 }} د.ج</div>
+                    <div class="cart-item-actions" style="margin-top: 10px;">
+                        <form method="POST" action="{% url 'cart_update' item.product.pk %}" style="display: flex; align-items: center; gap: 8px;">
+                            {% csrf_token %}
+                            <button type="button" class="qty-btn" onclick="this.nextElementSibling.value = Math.max(1, parseInt(this.nextElementSibling.value) - 1); this.closest('form').submit();">-</button>
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99"
+                                   class="qty-input" style="width: 50px;"
+                                   onchange="this.closest('form').submit();">
+                            <button type="button" class="qty-btn" onclick="this.previousElementSibling.value = Math.min(99, parseInt(this.previousElementSibling.value) + 1); this.closest('form').submit();">+</button>
+                        </form>
+                        <form method="POST" action="{% url 'cart_remove' item.product.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-btn">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 18px; font-weight: 700; color: var(--primary);">
+                        {{ item.total|floatformat:2 }} د.ج
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <div class="cart-summary">
+                <h3>ملخص الطلب</h3>
+                <div class="summary-row">
+                    <span>المنتجات ({{ cart_count }})</span>
+                    <span>{{ cart_total|floatformat:2 }} د.ج</span>
+                </div>
+                <div class="summary-row">
+                    <span>الشحن</span>
+                    <span style="color: #28a745;">يُحسب عند الطلب</span>
+                </div>
+                <div class="summary-row total">
+                    <span>المجموع</span>
+                    <span>{{ cart_total|floatformat:2 }} د.ج</span>
+                </div>
+                <a href="{% url 'checkout' %}" class="checkout-btn" style="display: block; text-align: center; margin-top: 15px;">
+                    <i class="fas fa-check-circle"></i> إتمام الطلب
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-shopping-cart"></i>
+        <h2>السلة فارغة</h2>
+        <p>لم تقم بإضافة أي منتج إلى السلة بعد</p>
+        <a href="{% url 'product_list' %}">تصفح المنتجات</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

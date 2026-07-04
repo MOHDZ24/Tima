@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}المنتجات - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h2>
+            {% if query %}نتائج البحث عن "{{ query }}"
+            {% elif selected_category %}فئة: {{ selected_category }}
+            {% else %}جميع المنتجات{% endif %}
+        </h2>
+        <div class="section-subtitle">{{ products|length }} منتج</div>
+    </div>
+
+    {% if products %}
+    <div class="products-grid">
+        {% for product in products %}
+        {% include 'products/_product_card.html' %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h2>لا توجد منتجات</h2>
+        <p>لم نجد منتجات تطابق بحثك. جرّب كلمات مختلفة.</p>
+        <a href="{% url 'product_list' %}">عرض جميع المنتجات</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

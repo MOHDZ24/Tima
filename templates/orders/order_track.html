@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تتبع الطلب - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h2><i class="fas fa-search"></i> تتبع الطلب</h2>
+        <div class="section-subtitle">أدخل رقم هاتفك للاستعلام عن طلبك</div>
+    </div>
+
+    <div class="track-form">
+        <form method="POST" action="{% url 'order_track' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="phone">رقم الهاتف</label>
+                <input type="tel" id="phone" name="phone" required placeholder="0XXX XXX XXX">
+            </div>
+            <div class="form-group">
+                <label for="order_id">رقم الطلب (اختياري)</label>
+                <input type="text" id="order_id" name="order_id" placeholder="مثال: 123">
+            </div>
+            <button type="submit" class="add-to-cart-btn" style="background: var(--primary);">
+                <i class="fas fa-search"></i> بحث
+            </button>
+        </form>
+    </div>
+
+    {% if order %}
+    <div class="track-result">
+        <h3 style="margin-bottom: 20px;"> نتيجة البحث</h3>
+        <div class="summary-row">
+            <span>رقم الطلب:</span>
+            <span>#{{ order.pk }}</span>
+        </div>
+        <div class="summary-row">
+            <span>الاسم:</span>
+            <span>{{ order.full_name }}</span>
+        </div>
+        <div class="summary-row">
+            <span>الولاية:</span>
+            <span>{{ order.wilaya }}</span>
+        </div>
+        <div class="summary-row">
+            <span>الحالة:</span>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div class="summary-row">
+            <span>طريقة الدفع:</span>
+            <span>{{ order.get_payment_method_display }}</span>
+        </div>
+        <div class="summary-row total">
+            <span>المجموع:</span>
+            <span>{{ order.total|floatformat:2 }} د.ج</span>
+        </div>
+        {% if order.tracking_number %}
+        <div class="summary-row">
+            <span>رقم التتبع:</span>
+            <span style="color: var(--primary); font-weight: 700;">{{ order.tracking_number }}</span>
+        </div>
+        {% endif %}
+        <div class="summary-row">
+            <span>تاريخ الطلب:</span>
+            <span>{{ order.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+
+        <h4 style="margin: 20px 0 10px;">المنتجات:</h4>
+        {% for item in order.items.all %}
+        <div class="summary-row" style="font-size: 14px;">
+            <span>{{ item.product_name }} × {{ item.quantity }}</span>
+            <span>{{ item.total_price|floatformat:2 }} د.ج</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

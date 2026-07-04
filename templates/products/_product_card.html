@@ -1,0 +1,37 @@
+{% load static %}
+<div class="product-card">
+    <a href="{{ product.get_absolute_url }}">
+        <div class="product-image">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            {% else %}
+            <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
+            {% endif %}
+            <div class="product-badges">
+                {% if product.is_new %}
+                <span class="badge badge-new"><i class="fas fa-star"></i> جديد</span>
+                {% endif %}
+                {% if product.is_on_sale %}
+                <span class="badge badge-sale"><i class="fas fa-fire"></i> عرض</span>
+                {% endif %}
+            </div>
+            <button class="wishlist-btn" title="إضافة للمفضلة">
+                <i class="fas fa-heart"></i>
+            </button>
+        </div>
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <div class="product-price">
+                {% if product.old_price %}
+                <span class="old-price">{{ product.old_price|floatformat:2 }} د.ج</span>
+                {% endif %}
+                <span class="current-price {% if product.is_on_sale %}promotion{% endif %}">
+                    {{ product.price|floatformat:2 }} د.ج
+                </span>
+                {% if product.savings %}
+                <span class="savings">وفر {{ product.savings|floatformat:2 }} د.ج</span>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>

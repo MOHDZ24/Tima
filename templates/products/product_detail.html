@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - رواق المسلم{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="product-detail">
+        <!-- Gallery -->
+        <div class="product-gallery">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image" id="mainImage">
+            {% endif %}
+            {% if product.image_2 or product.image_3 %}
+            <div class="product-thumbnails">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="active"
+                     onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('.product-thumbnails img').forEach(i=>i.classList.remove('active')); this.classList.add('active');">
+                {% endif %}
+                {% if product.image_2 %}
+                <img src="{{ product.image_2.url }}" alt="{{ product.name }}"
+                     onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('.product-thumbnails img').forEach(i=>i.classList.remove('active')); this.classList.add('active');">
+                {% endif %}
+                {% if product.image_3 %}
+                <img src="{{ product.image_3.url }}" alt="{{ product.name }}"
+                     onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('.product-thumbnails img').forEach(i=>i.classList.remove('active')); this.classList.add('active');">
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="product-detail-info">
+            <h1>{{ product.name }}</h1>
+
+            <div class="detail-price">
+                {% if product.old_price %}
+                <span class="old-price">{{ product.old_price|floatformat:2 }} د.ج</span>
+                {% endif %}
+                <span class="current-price {% if product.is_on_sale %}promotion{% endif %}">
+                    {{ product.price|floatformat:2 }} د.ج
+                </span>
+                {% if product.savings %}
+                <span class="savings">وفر {{ product.savings|floatformat:2 }} د.ج ({{ product.discount_percent }}%)</span>
+                {% endif %}
+            </div>
+
+            {% if product.category %}
+            <p style="margin-bottom: 15px; color: var(--text-muted);">
+                <i class="fas fa-folder"></i> {{ product.category.name }}
+            </p>
+            {% endif %}
+
+            {% if product.description %}
+            <div class="product-description">
+                {{ product.description|linebreaksbr }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'cart_add' product.pk %}">
+                {% csrf_token %}
+                <div class="quantity-selector">
+                    <label>الكمية:</label>
+                    <button type="button" class="qty-btn" onclick="changeQty(-1)">-</button>
+                    <input type="number" name="quantity" value="1" min="1" max="99" class="qty-input" id="qtyInput">
+                    <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+                </div>
+                <button type="submit" class="add-to-cart-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    أضف إلى السلة
+                </button>
+            </form>
+
+            <div style="margin-top: 20px; padding: 15px; background: var(--bg); border-radius: var(--radius-sm); font-size: 14px; color: var(--text-light);">
+                <p><i class="fas fa-truck"></i> التوصيل لجميع الولايات</p>
+                <p><i class="fas fa-shield-alt"></i> منتج أصلي 100%</p>
+                <p><i class="fas fa-undo"></i> إرجاع خلال 7 أيام</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <section style="padding: 40px 0;">
+        <div class="section-header">
+            <h2>منتجات مشابهة</h2>
+        </div>
+        <div class="products-grid">
+            {% for product in related_products %}
+            {% include 'products/_product_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+function changeQty(delta) {
+    const input = document.getElementById('qtyInput');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > 99) val = 99;
+    input.value = val;
+}
+</script>
+{% endblock %}

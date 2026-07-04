@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}رواق المسلم - متجر الملابس والكتب الإسلامية{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Floating Cart Icon -->
+    <a href="{% url 'cart_detail' %}" class="floating-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge">{{ cart_count }}</span>
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="container">
+                <div class="top-bar-content">
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                    <div class="top-links">
+                        <span>مرحباً بكم في رواق المسلم</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Header -->
+        <div class="main-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <a href="{% url 'home' %}">
+                            <span class="logo-text">رواق المسلم</span>
+                            <span class="logo-sub">متجر الملابس والكتب الإسلامية</span>
+                        </a>
+                    </div>
+
+                    <div class="search-container">
+                        <form method="GET" action="{% url 'product_list' %}" id="searchForm">
+                            <select name="category" class="category-select">
+                                <option value="">جميع المنتجات</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" class="search-input" placeholder="ابحث عن المنتجات..." name="q" value="{{ query|default:'' }}">
+                            <button class="search-btn" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="header-actions">
+                        <a href="{% url 'cart_detail' %}" class="cart-action">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">
+                                <span>{{ cart_count }}</span> منتج -
+                                <span>{{ cart_total|floatformat:2 }}</span> دج
+                            </span>
+                        </a>
+                        <button class="mobile-menu-btn" id="mobileMenuBtn">
+                            <span></span><span></span><span></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li><a href="{% url 'home' %}" class="nav-link">الرئيسية</a></li>
+                    <li><a href="{% url 'product_list' %}" class="nav-link">جميع المنتجات</a></li>
+                    {% for cat in categories %}
+                    <li><a href="{% url 'category_detail' cat.slug %}" class="nav-link">{{ cat.name }}</a></li>
+                    {% endfor %}
+                    <li><a href="{% url 'order_track' %}" class="nav-link">تتبع الطلب</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button class="alert-close">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>رواق المسلم</h3>
+                    <p>متجر متخصص في الملابس والكتب الإسلامية. نسعى لتقديم أفضل المنتجات بجودة عالية وأسعار مناسبة.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>روابط سريعة</h3>
+                    <ul>
+                        <li><a href="{% url 'home' %}">الرئيسية</a></li>
+                        <li><a href="{% url 'product_list' %}">المنتجات</a></li>
+                        <li><a href="{% url 'cart_detail' %}">سلة المشتريات</a></li>
+                        <li><a href="{% url 'order_track' %}">تتبع الطلب</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>الفئات</h3>
+                    <ul>
+                        {% for cat in categories %}
+                        <li><a href="{% url 'category_detail' cat.slug %}">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>تواصل معنا</h3>
+                    <div class="social-links-footer">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 رواق المسلم. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

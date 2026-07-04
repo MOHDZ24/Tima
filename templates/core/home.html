@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}رواق المسلم - الرئيسية{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>رواق المسلم</h1>
+        <p>أفضل الملابس والكتب الإسلامية بجودة عالية</p>
+        <a href="{% url 'product_list' %}" class="hero-btn">تسوق الآن</a>
+    </div>
+</section>
+
+<!-- Special Offers -->
+{% if special_offers %}
+<section class="container">
+    <div class="section-header">
+        <h2>🔥 عروض خاصة</h2>
+        <div class="section-subtitle">عروض محدودة - لا تفوّت الفرصة!</div>
+    </div>
+    <div class="products-grid">
+        {% for product in special_offers %}
+        {% include 'products/_product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- New Products -->
+{% if new_products %}
+<section class="container">
+    <div class="section-header">
+        <h2>⭐ منتجات جديدة</h2>
+        <div class="section-subtitle">أحدث المنتجات في المتجر</div>
+    </div>
+    <div class="products-grid">
+        {% for product in new_products %}
+        {% include 'products/_product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- All Products -->
+<section class="container">
+    <div class="section-header">
+        <h2>🛒 جميع المنتجات</h2>
+        <div class="section-subtitle">اكتشف مجموعتنا الكاملة</div>
+    </div>
+    <div class="products-grid">
+        {% for product in all_products %}
+        {% include 'products/_product_card.html' %}
+        {% endfor %}
+    </div>
+    <div style="text-align: center; padding: 30px 0;">
+        <a href="{% url 'product_list' %}" class="hero-btn" style="display: inline-block;">
+            عرض جميع المنتجات ←
+        </a>
+    </div>
+</section>
+{% endblock %}
