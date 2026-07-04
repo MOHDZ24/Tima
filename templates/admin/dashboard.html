@@ -1,0 +1,685 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --dash-primary: #1a5632;
+        --dash-gold: #c8a951;
+        --dash-red: #dc3545;
+        --dash-blue: #007bff;
+        --dash-green: #28a745;
+        --dash-orange: #fd7e14;
+        --dash-purple: #6f42c1;
+        --dash-bg: #f0f2f5;
+    }
+
+    body {
+        background: var(--dash-bg) !important;
+    }
+
+    #header {
+        background: var(--dash-primary) !important;
+    }
+
+    #branding h1 {
+        color: var(--dash-gold) !important;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 28px;
+        color: var(--dash-primary);
+        margin: 0;
+    }
+
+    .dashboard-header .date-display {
+        color: #666;
+        font-size: 14px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .stat-card.orders::before { background: var(--dash-blue); }
+    .stat-card.revenue::before { background: var(--dash-green); }
+    .stat-card.products::before { background: var(--dash-orange); }
+    .stat-card.customers::before { background: var(--dash-purple); }
+
+    .stat-card .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    .stat-card.orders .stat-icon { background: #e3f2fd; color: var(--dash-blue); }
+    .stat-card.revenue .stat-icon { background: #e8f5e9; color: var(--dash-green); }
+    .stat-card.products .stat-icon { background: #fff3e0; color: var(--dash-orange); }
+    .stat-card.customers .stat-icon { background: #f3e5f5; color: var(--dash-purple); }
+
+    .stat-card .stat-label {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 5px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .stat-change {
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .stat-change.up { color: var(--dash-green); }
+    .stat-change.down { color: var(--dash-red); }
+
+    /* Period Stats */
+    .period-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .period-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        text-align: center;
+    }
+
+    .period-card h3 {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 10px;
+    }
+
+    .period-card .period-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--dash-primary);
+    }
+
+    .period-card .period-revenue {
+        font-size: 14px;
+        color: var(--dash-green);
+        margin-top: 5px;
+    }
+
+    /* Charts Area */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .chart-card h3 {
+        font-size: 18px;
+        color: #2d2d2d;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Bar Chart */
+    .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        height: 200px;
+        padding: 0 10px;
+    }
+
+    .bar-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        justify-content: flex-end;
+    }
+
+    .bar {
+        width: 100%;
+        max-width: 50px;
+        background: linear-gradient(to top, var(--dash-primary), #2d8a4e);
+        border-radius: 6px 6px 0 0;
+        min-height: 5px;
+        transition: height 0.5s ease;
+        position: relative;
+    }
+
+    .bar:hover {
+        opacity: 0.8;
+    }
+
+    .bar-label {
+        font-size: 11px;
+        color: #888;
+        margin-top: 8px;
+    }
+
+    .bar-value {
+        font-size: 11px;
+        color: var(--dash-primary);
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    /* Donut Chart (CSS) */
+    .donut-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .donut-chart {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .donut-center .total-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d2d2d;
+    }
+
+    .donut-center .total-label {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .donut-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    /* Tables */
+    .table-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+    }
+
+    .table-card h3 {
+        font-size: 18px;
+        color: #2d2d2d;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        background: #f8f9fa;
+        padding: 12px 15px;
+        text-align: right;
+        font-size: 13px;
+        color: #666;
+        border-bottom: 2px solid #eee;
+    }
+
+    .data-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+    .data-table tr:hover td {
+        background: #f8f9fa;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .status-pending { background: #ffc107; color: #333; }
+    .status-confirmed { background: #17a2b8; }
+    .status-shipped { background: #007bff; }
+    .status-delivered { background: #28a745; }
+    .status-cancelled { background: #dc3545; }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        text-decoration: none;
+        color: #2d2d2d;
+        transition: all 0.2s;
+    }
+
+    .quick-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .quick-action-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .quick-action-text {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* Grid for bottom section */
+    .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .charts-grid { grid-template-columns: 1fr; }
+        .bottom-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .period-grid { grid-template-columns: 1fr; }
+        .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1>🕌 لوحة التحكم</h1>
+        <div class="date-display">
+            <span>📅 {% now "Y-m-d" %}</span>
+            <span style="margin-right: 15px;">🕐 {% now "H:i" %}</span>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="/admin/products/product/add/" class="quick-action">
+            <div class="quick-action-icon" style="background: #e8f5e9; color: #28a745;">➕</div>
+            <div class="quick-action-text">إضافة منتج</div>
+        </a>
+        <a href="/admin/orders/order/" class="quick-action">
+            <div class="quick-action-icon" style="background: #e3f2fd; color: #007bff;">📋</div>
+            <div class="quick-action-text">إدارة الطلبات</div>
+        </a>
+        <a href="/admin/products/category/" class="quick-action">
+            <div class="quick-action-icon" style="background: #fff3e0; color: #fd7e14;">📁</div>
+            <div class="quick-action-text">إدارة الفئات</div>
+        </a>
+        <a href="/admin/core/sitesettings/1/change/" class="quick-action">
+            <div class="quick-action-icon" style="background: #f3e5f5; color: #6f42c1;">⚙️</div>
+            <div class="quick-action-text">إعدادات الموقع</div>
+        </a>
+    </div>
+
+    <!-- Main Stats -->
+    <div class="stats-grid">
+        <div class="stat-card orders">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">إجمالي الطلبات</div>
+            <div class="stat-value">{{ total_orders }}</div>
+            <div class="stat-change up">
+                <span>📈</span>
+                <span>+{{ today_orders }} اليوم</span>
+            </div>
+        </div>
+
+        <div class="stat-card revenue">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">إجمالي الإيرادات</div>
+            <div class="stat-value">{{ total_revenue|floatformat:0 }} د.ج</div>
+            <div class="stat-change up">
+                <span>📈</span>
+                <span>+{{ today_revenue|floatformat:0 }} اليوم</span>
+            </div>
+        </div>
+
+        <div class="stat-card products">
+            <div class="stat-icon">🛍️</div>
+            <div class="stat-label">المنتجات النشطة</div>
+            <div class="stat-value">{{ total_products }}</div>
+            {% if low_stock %}
+            <div class="stat-change down">
+                <span>⚠️</span>
+                <span>{{ low_stock|length }} منتج منخفض المخزون</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="stat-card customers">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">العملاء</div>
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-change up">
+                <span>📈</span>
+                <span>عملاء فريدون</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Stats -->
+    <div class="period-grid">
+        <div class="period-card">
+            <h3>📊 اليوم</h3>
+            <div class="period-value">{{ today_orders }} طلب</div>
+            <div class="period-revenue">{{ today_revenue|floatformat:2 }} د.ج</div>
+        </div>
+        <div class="period-card">
+            <h3>📊 هذا الأسبوع</h3>
+            <div class="period-value">{{ week_orders }} طلب</div>
+            <div class="period-revenue">{{ week_revenue|floatformat:2 }} د.ج</div>
+        </div>
+        <div class="period-card">
+            <h3>📊 هذا الشهر</h3>
+            <div class="period-value">{{ month_orders }} طلب</div>
+            <div class="period-revenue">{{ month_revenue|floatformat:2 }} د.ج</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <!-- Sales Chart -->
+        <div class="chart-card">
+            <h3>📈 مبيعات آخر 7 أيام</h3>
+            <div class="bar-chart">
+                {% for day in daily_sales %}
+                <div class="bar-item">
+                    <div class="bar-value">{{ day.orders }}</div>
+                    <div class="bar" style="height: {% if day.revenue > 0 %}{{ day.revenue|floatformat:0 }}{% else %}5{% endif %}px; max-height: 100%;"></div>
+                    <div class="bar-label">{{ day.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Order Status Donut -->
+        <div class="chart-card">
+            <h3>📊 حالة الطلبات</h3>
+            <div class="donut-container">
+                {% with total=orders_by_status.pending|add:orders_by_status.confirmed|add:orders_by_status.shipped|add:orders_by_status.delivered|add:orders_by_status.cancelled %}
+                <div class="donut-chart" style="background: conic-gradient(
+                    #ffc107 0deg {% widthratio orders_by_status.pending total 360 %}deg,
+                    #17a2b8 {% widthratio orders_by_status.pending total 360 %}deg {% widthratio orders_by_status.pending|add:orders_by_status.confirmed total 360 %}deg,
+                    #007bff {% widthratio orders_by_status.pending|add:orders_by_status.confirmed total 360 %}deg {% widthratio orders_by_status.pending|add:orders_by_status.confirmed|add:orders_by_status.shipped total 360 %}deg,
+                    #28a745 {% widthratio orders_by_status.pending|add:orders_by_status.confirmed|add:orders_by_status.shipped total 360 %}deg {% widthratio orders_by_status.pending|add:orders_by_status.confirmed|add:orders_by_status.shipped|add:orders_by_status.delivered total 360 %}deg,
+                    #dc3545 {% widthratio orders_by_status.pending|add:orders_by_status.confirmed|add:orders_by_status.shipped|add:orders_by_status.delivered total 360 %}deg 360deg
+                );">
+                    <div class="donut-center">
+                        <div class="total-num">{{ total }}</div>
+                        <div class="total-label">طلب</div>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #ffc107;"></div>
+                        <span>قيد الانتظار ({{ orders_by_status.pending }})</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #17a2b8;"></div>
+                        <span>مؤكد ({{ orders_by_status.confirmed }})</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #007bff;"></div>
+                        <span>مشحون ({{ orders_by_status.shipped }})</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #28a745;"></div>
+                        <span>مسلّم ({{ orders_by_status.delivered }})</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #dc3545;"></div>
+                        <span>ملغي ({{ orders_by_status.cancelled }})</span>
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-grid">
+        <!-- Recent Orders -->
+        <div class="table-card">
+            <h3>📋 آخر الطلبات</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>العميل</th>
+                        <th>الولاية</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><a href="/admin/orders/order/{{ order.pk }}/change/">#{{ order.pk }}</a></td>
+                        <td>{{ order.full_name }}</td>
+                        <td>{{ order.wilaya }}</td>
+                        <td><strong>{{ order.total|floatformat:0 }} د.ج</strong></td>
+                        <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="/admin/orders/order/" style="color: var(--dash-primary); font-weight: 600;">عرض جميع الطلبات ←</a>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="table-card">
+            <h3>🏆 المنتجات الأكثر مبيعاً</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المنتج</th>
+                        <th>المبيعات</th>
+                        <th>الإيرادات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in top_products %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ product.product_name|truncatechars:30 }}</td>
+                        <td><strong>{{ product.total_sold }}</strong></td>
+                        <td>{{ product.total_revenue|floatformat:0 }} د.ج</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    {% if low_stock %}
+    <div class="table-card" style="border-left: 4px solid var(--dash-red);">
+        <h3>⚠️ تنبيه: منتجات منخفضة المخزون</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>الفئة</th>
+                    <th>المخزون</th>
+                    <th>السعر</th>
+                    <th>إجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category.name|default:"-" }}</td>
+                    <td>
+                        <span style="color: {% if product.stock == 0 %}#dc3545{% elif product.stock <= 3 %}#fd7e14{% else %}#ffc107{% endif %}; font-weight: 700;">
+                            {{ product.stock }}
+                        </span>
+                    </td>
+                    <td>{{ product.price|floatformat:0 }} د.ج</td>
+                    <td><a href="/admin/products/product/{{ product.pk }}/change/" style="color: var(--dash-primary);">تعديل</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Wilaya Stats -->
+    {% if orders_by_wilaya %}
+    <div class="table-card">
+        <h3>🗺️ الطلبات حسب الولاية</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>الولاية</th>
+                    <th>عدد الطلبات</th>
+                    <th>الإيرادات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wilaya in orders_by_wilaya %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ wilaya.wilaya }}</td>
+                    <td><strong>{{ wilaya.count }}</strong></td>
+                    <td>{{ wilaya.revenue|floatformat:0 }} د.ج</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{{ block.super }}
+{% endblock %}
